@@ -1,63 +1,30 @@
-<template>
-  <div>
-    <p v-if="title">{{ title }}
-    </p>
-    <div class="badges">
-      <Badge v-for="(item, index) in data" :key="index" :selected="modelValue.includes(item[valueLabel])"
-        @click="onClick(item[valueLabel])">
-        {{ item[titleLabel] }}
-      </Badge>
-
-      <span class="clear" v-if="modelValue && modelValue.length" @click="clear">
-        x clear
-      </span>
-    </div>
-  </div>
-</template>
-
 <script setup>
-import Badge from './Badge.vue';
 
-const props = defineProps({
-  title: {
-    type: String,
-    required: true
-  },
-  data: {
-    type: Array,
-    required: true
-  },
-  modelValue: {
-    type: Array,
-    required: true
-  },
-  valueLabel: {
-    type: String,
-    default: 'id'
-  },
-  titleLabel: {
-    type: String,
-    default: 'name'
-  }
-})
-
-const emit = defineEmits(['update:modelValue'])
-
-const onClick = (value) => {
-  if (props.modelValue.includes(value)) {
-    emit('update:modelValue', props.modelValue.filter(item => item !== value))
-  } else {
-    emit('update:modelValue', [...props.modelValue, value])
-  }
-}
-
-const clear = () => {
-  emit('update:modelValue', [])
-}
+import {useTaskStore} from '@/stores/tasksStore';
+const store= useTaskStore();
 
 </script>
 
-<style lang="scss">
+<template>
+    <div class="filters">
+      <div>
+        <p>Filter by state</p>
+        <div class="badges">
+          <div @click="store.setFilter('Not Done')" class="badge" :class="{selected : store.filterBy==='Not Done'}">
+            To-Do
+          </div>
+          <div @click="store.setFilter('Done')" class="badge" :class="{selected : store.filterBy==='Done'}">
+            Done
+          </div>
+          <span class="clear" v-if="store.filterBy" @click="store.setFilter('')">
+            x clear
+          </span>
+        </div>
+      </div>
+    </div>
+</template>
+
+<style lang="scss" scoped>
 .filters {
   display: flex;
   flex-direction: column;
@@ -80,7 +47,7 @@ const clear = () => {
   }
 
   .clear {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     line-height: 16px;
     letter-spacing: 0em;
